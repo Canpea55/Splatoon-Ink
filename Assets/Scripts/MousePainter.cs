@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class MousePainter : MonoBehaviour{
@@ -21,13 +22,45 @@ public class MousePainter : MonoBehaviour{
             Ray ray = cam.ScreenPointToRay(position);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 100.0f)){
-                Debug.DrawRay(ray.origin, hit.point - ray.origin, Color.red);
-                transform.position = hit.point;
-                Paintable p = hit.collider.GetComponent<Paintable>();
-                if(p != null){
-                    PaintManager.instance.paint(p, hit.point, radius, hardness, strength, paintColor);
+            switch(Input.GetKey(KeyCode.LeftAlt))
+            {
+                case true:
+                if (Physics.Raycast(ray, out hit, 100.0f))
+                {
+                    Vector2 UVCoord = hit.textureCoord;
+
+                    Paintable p = hit.collider.GetComponent<Paintable>();
+                    RenderTexture mask = p.getMask();
+
+                    Texture2D mask2D = new Texture2D(mask.width, mask.height, TextureFormat.RGBA32, false);
+                    RenderTexture renderTexture = new RenderTexture(mask.width, mask.height, 32);
+                    
+                    Graphics.Blit(mask, renderTexture);
+
+                    RenderTexture.active = renderTexture;
+                    mask2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+                    mask2D.Apply();
+
+                    UVCoord.x *= mask2D.width;
+                    UVCoord.y *= mask2D.height;
+
+                    print(mask2D.GetPixel(Mathf.RoundToInt(UVCoord.x), Mathf.RoundToInt(UVCoord.y)));
+                    print(UVCoord);
                 }
+                break;
+                
+                case false:
+                if (Physics.Raycast(ray, out hit, 100.0f))
+                {
+                    Debug.DrawRay(ray.origin, hit.point - ray.origin, Color.red);
+                    // transform.position = hit.point;
+                    Paintable p = hit.collider.GetComponent<Paintable>();
+                    if(p != null)
+                    {
+                        PaintManager.instance.paint(p, hit.point, radius, hardness, strength, paintColor);
+                    }
+                }
+                break;
             }
         }
 
