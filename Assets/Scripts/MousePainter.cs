@@ -44,8 +44,8 @@ public class MousePainter : MonoBehaviour{
                     UVCoord.x *= mask2D.width;
                     UVCoord.y *= mask2D.height;
 
-                    print(mask2D.GetPixel(Mathf.RoundToInt(UVCoord.x), Mathf.RoundToInt(UVCoord.y)));
-                    print(UVCoord);
+                    Color a = mask2D.GetPixel(Mathf.RoundToInt(UVCoord.x), Mathf.RoundToInt(UVCoord.y));
+                    print(UVCoord + " : " + a.a);
                 }
                 break;
                 
